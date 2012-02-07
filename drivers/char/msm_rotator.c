@@ -953,13 +953,19 @@ static int msm_rotator_start(unsigned long arg)
 	case MDP_XRGB_8888:
 	case MDP_RGBX_8888:
 	case MDP_BGRA_8888:
+		info.dst.format = info.src.format;
 	case MDP_Y_CBCR_H2V2:
 	case MDP_Y_CRCB_H2V2:
 	case MDP_Y_CBCR_H2V1:
 	case MDP_Y_CRCB_H2V1:
+		info.dst.format = info.src.format;
+		break;
 	case MDP_YCRYCB_H2V1:
-	case MDP_Y_CRCB_H2V2_TILE:
+		info.dst.format = MDP_Y_CRCB_H2V1;
+		break;
+        case MDP_Y_CB_CR_H2V2:
 	case MDP_Y_CBCR_H2V2_TILE:
+		info.dst.format = MDP_Y_CBCR_H2V2;
 		break;
 	default:
 		return -EINVAL;
@@ -978,6 +984,10 @@ static int msm_rotator_start(unsigned long arg)
 	case MDP_Y_CBCR_H2V1:
 	case MDP_Y_CRCB_H2V1:
 	case MDP_YCRYCB_H2V1:
+	case MDP_Y_CR_CB_H2V2:
+	case MDP_Y_CR_CB_GH2V2:
+	case MDP_Y_CRCB_H2V2_TILE:
+		info.dst.format = MDP_Y_CRCB_H2V2;
 		break;
 	default:
 		return -EINVAL;
