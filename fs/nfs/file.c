@@ -27,6 +27,8 @@
 #include <linux/slab.h>
 #include <linux/pagemap.h>
 #include <linux/aio.h>
+#include <linux/gfp.h>
+#include <linux/swap.h>
 
 #include <asm/uaccess.h>
 #include <asm/system.h>
@@ -484,10 +486,13 @@ static void nfs_invalidate_page(struct page *page, unsigned long offset)
  */
 static int nfs_release_page(struct page *page, gfp_t gfp)
 {
+	struct address_space *mapping = page->mapping;
+
 	dfprintk(PAGECACHE, "NFS: release_page(%p)\n", page);
 
 	if (gfp & __GFP_WAIT)
 		nfs_wb_page(page->mapping->host, page);
+
 	/* If PagePrivate() is set, then the page is not freeable */
 	if (PagePrivate(page))
 		return 0;
