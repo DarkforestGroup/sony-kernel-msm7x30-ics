@@ -162,9 +162,11 @@ not_angel:
 
 		.text
 		adr	r0, LC0
+
  ARM(		ldmia	r0, {r1, r2, r3, r4, r5, r6, ip, sp}	)
  THUMB(		ldmia	r0, {r1, r2, r3, r4, r5, r6, ip}	)
  THUMB(		ldr	sp, [r0, #28]				)
+
 		subs	r0, r0, r1		@ calculate the delta offset
 
 						@ if delta is zero, we are

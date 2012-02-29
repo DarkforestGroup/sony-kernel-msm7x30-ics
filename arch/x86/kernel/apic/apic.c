@@ -1664,6 +1664,7 @@ int __init APIC_init_uniprocessor(void)
 	}
 #endif
 
+#ifndef CONFIG_SMP
 	enable_IR_x2apic();
 #ifdef CONFIG_X86_64
 	default_setup_apic_routing();

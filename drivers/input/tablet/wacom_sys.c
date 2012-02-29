@@ -566,6 +566,7 @@ static int wacom_resume(struct usb_interface *intf)
 		rv = usb_submit_urb(wacom->irq, GFP_NOIO);
 	else
 		rv = 0;
+
 	mutex_unlock(&wacom->lock);
 
 	return rv;
