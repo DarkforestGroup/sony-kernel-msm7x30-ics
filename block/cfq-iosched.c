@@ -2062,12 +2062,12 @@ cfq_update_io_seektime(struct cfq_data *cfqd, struct cfq_queue *cfqq,
 	else
 		sdist = min(sdist, (cfqq->seek_mean * 4) + 2*1024*64);
 
+
 	cfqq->seek_samples = (7*cfqq->seek_samples + 256) / 8;
 	cfqq->seek_total = (7*cfqq->seek_total + (u64)256*sdist) / 8;
 	total = cfqq->seek_total + (cfqq->seek_samples/2);
 	do_div(total, cfqq->seek_samples);
 	cfqq->seek_mean = (sector_t)total;
-
 	/*
 	 * If this cfqq is shared between multiple processes, check to
 	 * make sure that those processes are still issuing I/Os within
