@@ -539,7 +539,7 @@ static int tty_ldisc_halt(struct tty_struct *tty)
 static int tty_ldisc_wait_idle(struct tty_struct *tty)
 {
 	int ret;
-	ret = wait_event_interruptible_timeout(tty_ldisc_idle,
+	ret = wait_event_timeout(tty_ldisc_idle,
 			atomic_read(&tty->ldisc->users) == 1, 5 * HZ);
 	if (ret < 0)
 		return ret;
@@ -733,6 +733,8 @@ static void tty_ldisc_reinit(struct tty_struct *tty)
 
 	if (IS_ERR(ld))
 		return -1;
+
+	WARN_ON_ONCE(tty_ldisc_wait_idle(tty));
 
 	tty_ldisc_close(tty, tty->ldisc);
 	tty_ldisc_put(tty->ldisc);
