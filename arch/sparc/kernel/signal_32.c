@@ -255,7 +255,7 @@ static inline void __user *get_sigframe(struct sigaction *sa, struct pt_regs *re
 	 */
 	sp &= ~7UL;
 
-	return (void __user *)(sp - framesize);
+	return (void __user *) sp;
 }
 
 static int setup_frame(struct k_sigaction *ka, struct pt_regs *regs,

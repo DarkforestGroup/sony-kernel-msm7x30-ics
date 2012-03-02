@@ -426,7 +426,11 @@ static void __user *get_sigframe(struct sigaction *sa, struct pt_regs *regs, uns
 	 */
 	sp &= ~7UL;
 
+<<<<<<< HEAD
 	return (void __user *)(sp - framesize);
+=======
+	return (void __user *) sp;
+>>>>>>> f4ff319... updated to 2.6.32.47
 }
 
 /* The I-cache flush instruction only works in the primary ASI, which
