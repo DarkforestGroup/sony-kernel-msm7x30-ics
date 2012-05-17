@@ -729,10 +729,7 @@ static void tty_reset_termios(struct tty_struct *tty)
 
 static void tty_ldisc_reinit(struct tty_struct *tty)
 {
-	struct tty_ldisc *ld = tty_ldisc_get(ldisc);
-
-	if (IS_ERR(ld))
-		return -1;
+	struct tty_ldisc *ld;
 
 	WARN_ON_ONCE(tty_ldisc_wait_idle(tty));
 
@@ -742,10 +739,11 @@ static void tty_ldisc_reinit(struct tty_struct *tty)
 	/*
 	 *	Switch the line discipline back
 	 */
+	
+	ld = tty_ldisc_get(N_TTY);
+	BUG_ON(IS_ERR(ld));
 	tty_ldisc_assign(tty, ld);
-	tty_set_termios_ldisc(tty, ldisc);
-
-	return 0;
+	tty_set_termios_ldisc(tty, N_TTY);
 }
 
 /**
