@@ -66,6 +66,7 @@ static int snd_hrtimer_open(struct snd_timer *t)
 	hrtimer_init(&stime->hrt, CLOCK_MONOTONIC, HRTIMER_MODE_REL);
 	stime->timer = t;
 	stime->hrt.function = snd_hrtimer_callback;
+	atomic_set(&stime->running, 0);
 	t->private_data = stime;
 	return 0;
 }
@@ -86,16 +87,18 @@ static int snd_hrtimer_start(struct snd_timer *t)
 {
 	struct snd_hrtimer *stime = t->private_data;
 
+	atomic_set(&stime->running, 0);
+	hrtimer_cancel(&stime->hrt);
 	hrtimer_start(&stime->hrt, ns_to_ktime(t->sticks * resolution),
 		      HRTIMER_MODE_REL);
+	atomic_set(&stime->running, 1);
 	return 0;
 }
 
 static int snd_hrtimer_stop(struct snd_timer *t)
 {
 	struct snd_hrtimer *stime = t->private_data;
-
-	hrtimer_cancel(&stime->hrt);
+	atomic_set(&stime->running, 0);
 	return 0;
 }
 

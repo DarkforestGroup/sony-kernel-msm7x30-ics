@@ -1040,6 +1040,8 @@ void __init setup_arch(char **cmdline_p)
 #endif
 #endif
 	x86_init.oem.banner();
+
+	mcheck_intel_therm_init();
 }
 
 #ifdef CONFIG_X86_32

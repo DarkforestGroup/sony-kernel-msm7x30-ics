@@ -292,22 +292,7 @@ int __ref cpu_down(unsigned int cpu)
 	 */
 	synchronize_sched();
 
-	set_cpu_active(cpu, false);
-
-	/*
-	 * Make sure the all cpus did the reschedule and are not
-	 * using stale version of the cpu_active_mask.
-	 * This is not strictly necessary becuase stop_machine()
-	 * that we run down the line already provides the required
-	 * synchronization. But it's really a side effect and we do not
-	 * want to depend on the innards of the stop_machine here.
-	 */
-	synchronize_sched();
-
 	err = _cpu_down(cpu, 0);
-
-	if (cpu_online(cpu))
-		set_cpu_active(cpu, true);
 
 out:
 	cpu_maps_update_done();
