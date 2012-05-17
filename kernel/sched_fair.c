@@ -35,14 +35,12 @@
  *  run vmstat and monitor the context-switches (cs) field)
  */
 unsigned int sysctl_sched_latency = 5000000ULL;
-unsigned int normalized_sysctl_sched_latency = 5000000ULL;
 
 /*
  * Minimal preemption granularity for CPU-bound tasks:
  * (default: 1 msec * (1 + ilog(ncpus)), units: nanoseconds)
  */
 unsigned int sysctl_sched_min_granularity = 1000000ULL;
-unsigned int normalized_sysctl_sched_min_granularity = 1000000ULL;
 
 /*
  * is kept at sysctl_sched_latency / sysctl_sched_min_granularity
@@ -72,7 +70,6 @@ unsigned int __read_mostly sysctl_sched_compat_yield;
  * have immediate wakeup/sleep latencies.
  */
 unsigned int sysctl_sched_wakeup_granularity = 1000000UL;
-unsigned int normalized_sysctl_sched_wakeup_granularity = 1000000UL;
 
 const_debug unsigned int sysctl_sched_migration_cost = 500000UL;
 
@@ -1242,6 +1239,8 @@ static int wake_affine(struct sched_domain *sd, struct task_struct *p, int sync)
 		100*(this_load + effective_load(tg, this_cpu, weight, weight)) <=
 		imbalance*(load + effective_load(tg, prev_cpu, 0, weight));
 
+	imbalance = 100 + (sd->imbalance_pct - 100) / 2;
+
 	/*
 	 * If the currently running task will sleep within
 	 * a reasonable amount of time then attract this newly
@@ -1883,17 +1882,6 @@ move_one_task_fair(struct rq *this_rq, int this_cpu, struct rq *busiest,
 
 	return 0;
 }
-
-static void rq_online_fair(struct rq *rq)
-{
-	update_sysctl();
-}
-
-static void rq_offline_fair(struct rq *rq)
-{
-	update_sysctl();
-}
-
 #endif /* CONFIG_SMP */
 
 /*

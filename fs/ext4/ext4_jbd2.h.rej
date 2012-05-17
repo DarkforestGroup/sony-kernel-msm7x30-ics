@@ -1,0 +1,29 @@
+--- fs/ext4/ext4_jbd2.h
++++ fs/ext4/ext4_jbd2.h
+@@ -265,7 +248,7 @@
+ 		return 1;
+ 	if (test_opt(inode->i_sb, DATA_FLAGS) == EXT4_MOUNT_JOURNAL_DATA)
+ 		return 1;
+-	if (ext4_test_inode_flag(inode, EXT4_INODE_JOURNAL_DATA))
++	if (EXT4_I(inode)->i_flags & EXT4_JOURNAL_DATA_FL)
+ 		return 1;
+ 	return 0;
+ }
+@@ -276,7 +259,7 @@
+ 		return 0;
+ 	if (!S_ISREG(inode->i_mode))
+ 		return 0;
+-	if (ext4_test_inode_flag(inode, EXT4_INODE_JOURNAL_DATA))
++	if (EXT4_I(inode)->i_flags & EXT4_JOURNAL_DATA_FL)
+ 		return 0;
+ 	if (test_opt(inode->i_sb, DATA_FLAGS) == EXT4_MOUNT_ORDERED_DATA)
+ 		return 1;
+@@ -289,7 +272,7 @@
+ 		return 0;
+ 	if (EXT4_JOURNAL(inode) == NULL)
+ 		return 1;
+-	if (ext4_test_inode_flag(inode, EXT4_INODE_JOURNAL_DATA))
++	if (EXT4_I(inode)->i_flags & EXT4_JOURNAL_DATA_FL)
+ 		return 0;
+ 	if (test_opt(inode->i_sb, DATA_FLAGS) == EXT4_MOUNT_WRITEBACK_DATA)
+ 		return 1;

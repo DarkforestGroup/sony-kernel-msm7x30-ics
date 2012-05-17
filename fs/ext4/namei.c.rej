@@ -1,0 +1,15 @@
+--- fs/ext4/namei.c
++++ fs/ext4/namei.c
+@@ -1528,11 +1533,7 @@
+ 	de = (struct ext4_dir_entry_2 *) bh->b_data;
+ 	de->inode = 0;
+ 	de->rec_len = ext4_rec_len_to_disk(blocksize, blocksize);
+-	retval = add_dirent_to_buf(handle, dentry, inode, de, bh);
+-	brelse(bh);
+-	if (retval == 0)
+-		ext4_set_inode_state(inode, EXT4_STATE_NEWENTRY);
+-	return retval;
++	return add_dirent_to_buf(handle, dentry, inode, de, bh);
+ }
+ 
+ /*

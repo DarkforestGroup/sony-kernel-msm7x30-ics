@@ -1,0 +1,12 @@
+--- drivers/net/qlge/qlge_mpi.c
++++ drivers/net/qlge/qlge_mpi.c
+@@ -446,6 +446,9 @@
+ 		ql_aen_lost(qdev, mbcp);
+ 		break;
+ 
++	case AEN_DCBX_CHG:
++		/* Need to support AEN 8110 */
++		break;
+ 	default:
+ 		QPRINTK(qdev, DRV, ERR,
+ 			"Unsupported AE %.08x.\n", mbcp->mbox_out[0]);

@@ -1710,6 +1710,7 @@ ecryptfs_encrypt_filename(struct ecryptfs_filename *filename,
 		goto out;
 	}
 out:
+	kfree(full_alg_name);
 	return rc;
 }
 
@@ -1748,7 +1749,7 @@ ecryptfs_process_key_cipher(struct crypto_blkcipher **key_tfm,
 			    char *cipher_name, size_t *key_size)
 {
 	char dummy_key[ECRYPTFS_MAX_KEY_BYTES];
-	char *full_alg_name = NULL;
+	char *full_alg_name;
 	int rc;
 
 	*key_tfm = NULL;
@@ -1763,6 +1764,7 @@ ecryptfs_process_key_cipher(struct crypto_blkcipher **key_tfm,
 	if (rc)
 		goto out;
 	*key_tfm = crypto_alloc_blkcipher(full_alg_name, 0, CRYPTO_ALG_ASYNC);
+	kfree(full_alg_name);
 	if (IS_ERR(*key_tfm)) {
 		rc = PTR_ERR(*key_tfm);
 		printk(KERN_ERR "Unable to allocate crypto cipher with name "
@@ -1785,7 +1787,6 @@ ecryptfs_process_key_cipher(struct crypto_blkcipher **key_tfm,
 		goto out;
 	}
 out:
-	kfree(full_alg_name);
 	return rc;
 }
 

@@ -1,0 +1,13 @@
+--- drivers/net/wireless/ath/ath5k/base.c
++++ drivers/net/wireless/ath/ath5k/base.c
+@@ -2441,10 +2506,6 @@
+ 
+ 	/* Set ack to be sent at low bit-rates */
+ 	ath5k_hw_set_ack_bitrate_high(ah, false);
+-
+-	/* Set PHY calibration inteval */
+-	ah->ah_cal_intval = ath5k_calinterval;
+-
+ 	ret = 0;
+ done:
+ 	mmiowb();

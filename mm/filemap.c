@@ -1683,18 +1683,31 @@ repeat:
 	return page;
 }
 
-static struct page *do_read_cache_page(struct address_space *mapping,
+/**
+ * read_cache_page_async - read into page cache, fill it if needed
+ * @mapping:	the page's address_space
+ * @index:	the page index
+ * @filler:	function to perform the read
+ * @data:	destination for read data
+ *
+ * Same as read_cache_page, but don't wait for page to become unlocked
+ * after submitting it to the filler.
+ *
+ * Read into the page cache. If a page already exists, and PageUptodate() is
+ * not set, try to fill the page but don't wait for it to become unlocked.
+ *
+ * If the page does not get brought uptodate, return -EIO.
+ */
+struct page *read_cache_page_async(struct address_space *mapping,
 				pgoff_t index,
 				int (*filler)(void *,struct page*),
-				void *data,
-				gfp_t gfp)
-
+				void *data)
 {
 	struct page *page;
 	int err;
 
 retry:
-	page = __read_cache_page(mapping, index, filler, data, gfp);
+	page = __read_cache_page(mapping, index, filler, data);
 	if (IS_ERR(page))
 		return page;
 	if (PageUptodate(page))
@@ -1797,7 +1810,18 @@ struct page *read_cache_page(struct address_space *mapping,
 				int (*filler)(void *,struct page*),
 				void *data)
 {
-	return wait_on_page_read(read_cache_page_async(mapping, index, filler, data));
+	struct page *page;
+
+	page = read_cache_page_async(mapping, index, filler, data);
+	if (IS_ERR(page))
+		goto out;
+	wait_on_page_locked(page);
+	if (!PageUptodate(page)) {
+		page_cache_release(page);
+		page = ERR_PTR(-EIO);
+	}
+ out:
+	return page;
 }
 EXPORT_SYMBOL(read_cache_page);
 

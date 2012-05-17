@@ -1,0 +1,11 @@
+--- drivers/media/video/gspca/sn9c20x.c
++++ drivers/media/video/gspca/sn9c20x.c
+@@ -2319,7 +2319,7 @@
+ 		}
+ 	}
+ 	if (avg_lum > MAX_AVG_LUM) {
+-		if (sd->gain - 1 >= 0) {
++		if (sd->gain >= 1) {
+ 			sd->gain--;
+ 			set_gain(gspca_dev);
+ 		}

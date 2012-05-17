@@ -1,0 +1,24 @@
+--- drivers/usb/core/message.c
++++ drivers/usb/core/message.c
+@@ -1221,13 +1228,6 @@
+ 		if (dev->state == USB_STATE_CONFIGURED)
+ 			usb_set_device_state(dev, USB_STATE_ADDRESS);
+ 	}
+-
+-	dev_dbg(&dev->dev, "%s nuking %s URBs\n", __func__,
+-		skip_ep0 ? "non-ep0" : "all");
+-	for (i = skip_ep0; i < 16; ++i) {
+-		usb_disable_endpoint(dev, i, true);
+-		usb_disable_endpoint(dev, i + USB_DIR_IN, true);
+-	}
+ }
+ 
+ /**
+@@ -1799,7 +1799,6 @@
+ 		intf->dev.groups = usb_interface_groups;
+ 		intf->dev.dma_mask = dev->dev.dma_mask;
+ 		INIT_WORK(&intf->reset_ws, __usb_queue_reset_device);
+-		intf->minor = -1;
+ 		device_initialize(&intf->dev);
+ 		mark_quiesced(intf);
+ 		dev_set_name(&intf->dev, "%d-%s:%d.%d",

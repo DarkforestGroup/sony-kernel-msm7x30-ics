@@ -1,0 +1,66 @@
+--- fs/ext4/super.c
++++ fs/ext4/super.c
+@@ -700,16 +697,10 @@
+ 	ei->i_reserved_data_blocks = 0;
+ 	ei->i_reserved_meta_blocks = 0;
+ 	ei->i_allocated_meta_blocks = 0;
+-	ei->i_da_metadata_calc_len = 0;
+ 	ei->i_delalloc_reserved_flag = 0;
+ 	spin_lock_init(&(ei->i_block_reservation_lock));
+-#ifdef CONFIG_QUOTA
+-	ei->i_reserved_quota = 0;
+-#endif
+ 	INIT_LIST_HEAD(&ei->i_aio_dio_complete_list);
+ 	ei->cur_aio_dio = NULL;
+-	ei->i_sync_tid = 0;
+-	ei->i_datasync_tid = 0;
+ 
+ 	return &ei->vfs_inode;
+ }
+@@ -1562,22 +1533,15 @@
+ 			set_opt(sbi->s_mount_opt,NO_AUTO_DA_ALLOC);
+ 			break;
+ 		case Opt_auto_da_alloc:
+-			if (args[0].from) {
+-				if (match_int(&args[0], &option))
+-					return 0;
+-			} else
+-				option = 1;	/* No argument, default to 1 */
++			if (match_int(&args[0], &option)) {
++				clear_opt(sbi->s_mount_opt, NO_AUTO_DA_ALLOC);
++				break;
++			}
+ 			if (option)
+ 				clear_opt(sbi->s_mount_opt, NO_AUTO_DA_ALLOC);
+ 			else
+ 				set_opt(sbi->s_mount_opt,NO_AUTO_DA_ALLOC);
+ 			break;
+-		case Opt_discard:
+-			set_opt(sbi->s_mount_opt, DISCARD);
+-			break;
+-		case Opt_nodiscard:
+-			clear_opt(sbi->s_mount_opt, DISCARD);
+-			break;
+ 		default:
+ 			ext4_msg(sb, KERN_ERR,
+ 			       "Unrecognized mount option \"%s\" "
+@@ -1682,15 +1646,16 @@
+ 	struct ext4_group_desc *gdp = NULL;
+ 	ext4_group_t flex_group_count;
+ 	ext4_group_t flex_group;
+-	unsigned int groups_per_flex = 0;
++	int groups_per_flex = 0;
+ 	size_t size;
+ 	int i;
+ 
+-	sbi->s_log_groups_per_flex = sbi->s_es->s_log_groups_per_flex;
+-	if (sbi->s_log_groups_per_flex < 1 || sbi->s_log_groups_per_flex > 31) {
++	if (!sbi->s_es->s_log_groups_per_flex) {
+ 		sbi->s_log_groups_per_flex = 0;
+ 		return 1;
+ 	}
++
++	sbi->s_log_groups_per_flex = sbi->s_es->s_log_groups_per_flex;
+ 	groups_per_flex = 1 << sbi->s_log_groups_per_flex;
+ 
+ 	/* We allocate both existing and potentially added groups */

@@ -1,0 +1,54 @@
+--- kernel/futex.c
++++ kernel/futex.c
+@@ -204,7 +204,7 @@
+  * @fshared:	0 for a PROCESS_PRIVATE futex, 1 for PROCESS_SHARED
+  * @key:	address where result is stored.
+  * @rw:		mapping needs to be read/write (values: VERIFY_READ,
+- *              VERIFY_WRITE)
++ * 		VERIFY_WRITE)
+  *
+  * Returns a negative error code or 0
+  * The key words are stored in *key on success.
+@@ -221,7 +221,7 @@
+ 	unsigned long address = (unsigned long)uaddr;
+ 	struct mm_struct *mm = current->mm;
+ 	struct page *page;
+-	int err, ro = 0;
++	int err;
+ 
+ 	/*
+ 	 * The futex address must be "naturally" aligned.
+@@ -248,32 +248,15 @@
+ 	}
+ 
+ again:
+-	err = get_user_pages_fast(address, 1, 1, &page);
+-	/*
+-	 * If write access is not required (eg. FUTEX_WAIT), try
+-	 * and get read-only access.
+-	 */
+-	if (err == -EFAULT && rw == VERIFY_READ) {
+-		err = get_user_pages_fast(address, 1, 0, &page);
+-		ro = 1;
+-	}
++	err = get_user_pages_fast(address, 1, rw == VERIFY_WRITE, &page);
+ 	if (err < 0)
+ 		return err;
+-	else
+-		err = 0;
+ 
+ 	page = compound_head(page);
+ 	lock_page(page);
+ 	if (!page->mapping) {
+ 		unlock_page(page);
+ 		put_page(page);
+-		/*
+-		* ZERO_PAGE pages don't have a mapping. Avoid a busy loop
+-		* trying to find one. RW mapping would have COW'd (and thus
+-		* have a mapping) so this page is RO and won't ever change.
+-		*/
+-		if ((page == ZERO_PAGE(address)))
+-			return -EFAULT;
+ 		goto again;
+ 	}
+ 

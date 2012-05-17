@@ -192,9 +192,14 @@ static int nfs_wait_bit_uninterruptible(void *word)
 int
 nfs_wait_on_request(struct nfs_page *req)
 {
-	return wait_on_bit(&req->wb_flags, PG_BUSY,
-			nfs_wait_bit_uninterruptible,
-			TASK_UNINTERRUPTIBLE);
+	int ret = 0;
+
+	if (!test_bit(PG_BUSY, &req->wb_flags))
+		goto out;
+	ret = out_of_line_wait_on_bit(&req->wb_flags, PG_BUSY,
+			nfs_wait_bit_killable, TASK_KILLABLE);
+out:
+	return ret;
 }
 
 /**

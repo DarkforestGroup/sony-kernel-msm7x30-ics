@@ -1,0 +1,20 @@
+--- mm/memory.c
++++ mm/memory.c
+@@ -2526,7 +2538,7 @@
+ 			ret = VM_FAULT_HWPOISON;
+ 		} else {
+ 			print_bad_pte(vma, address, orig_pte, NULL);
+-			ret = VM_FAULT_OOM;
++			ret = VM_FAULT_SIGBUS;
+ 		}
+ 		goto out;
+ 	}
+@@ -2960,7 +3010,7 @@
+ 		 * Page table corrupted: show pte and kill process.
+ 		 */
+ 		print_bad_pte(vma, address, orig_pte, NULL);
+-		return VM_FAULT_OOM;
++		return VM_FAULT_SIGBUS;
+ 	}
+ 
+ 	pgoff = pte_to_pgoff(orig_pte);

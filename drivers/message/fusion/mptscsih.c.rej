@@ -1,0 +1,11 @@
+--- drivers/message/fusion/mptscsih.c
++++ drivers/message/fusion/mptscsih.c
+@@ -1796,7 +1872,7 @@
+ 		dtmprintk(ioc, printk(MYIOC_s_DEBUG_FMT "task abort: "
+ 		   "Command not in the active list! (sc=%p)\n", ioc->name,
+ 		   SCpnt));
+-		retval = 0;
++		retval = SUCCESS;
+ 		goto out;
+ 	}
+ 

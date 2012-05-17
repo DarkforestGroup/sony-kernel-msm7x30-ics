@@ -1,0 +1,10 @@
+--- include/linux/sysctl.h
++++ include/linux/sysctl.h
+@@ -490,6 +490,7 @@
+ 	NET_IPV4_CONF_PROMOTE_SECONDARIES=20,
+ 	NET_IPV4_CONF_ARP_ACCEPT=21,
+ 	NET_IPV4_CONF_ARP_NOTIFY=22,
++	NET_IPV4_CONF_SRC_VMARK=24,
+ 	__NET_IPV4_CONF_MAX
+ };
+ 

@@ -96,7 +96,7 @@ static void pca_isa_resetchip(void *pd)
 }
 
 static irqreturn_t pca_handler(int this_irq, void *dev_id) {
-	wake_up(&pca_wait);
+	wake_up_interruptible(&pca_wait);
 	return IRQ_HANDLED;
 }
 

@@ -1,0 +1,42 @@
+--- kernel/sched_clock.c
++++ kernel/sched_clock.c
+@@ -236,6 +236,18 @@
+ }
+ EXPORT_SYMBOL_GPL(sched_clock_idle_wakeup_event);
+ 
++unsigned long long cpu_clock(int cpu)
++{
++	unsigned long long clock;
++	unsigned long flags;
++
++	local_irq_save(flags);
++	clock = sched_clock_cpu(cpu);
++	local_irq_restore(flags);
++
++	return clock;
++}
++
+ #else /* CONFIG_HAVE_UNSTABLE_SCHED_CLOCK */
+ 
+ void sched_clock_init(void)
+@@ -251,17 +263,12 @@
+ 	return sched_clock();
+ }
+ 
+-#endif /* CONFIG_HAVE_UNSTABLE_SCHED_CLOCK */
+ 
+ unsigned long long cpu_clock(int cpu)
+ {
+-	unsigned long long clock;
+-	unsigned long flags;
++	return sched_clock_cpu(cpu);
++}
+ 
+-	local_irq_save(flags);
+-	clock = sched_clock_cpu(cpu);
+-	local_irq_restore(flags);
++#endif /* CONFIG_HAVE_UNSTABLE_SCHED_CLOCK */
+ 
+-	return clock;
+-}
+ EXPORT_SYMBOL_GPL(cpu_clock);

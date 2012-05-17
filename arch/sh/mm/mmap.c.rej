@@ -1,0 +1,12 @@
+--- arch/sh/mm/mmap.c
++++ arch/sh/mm/mmap.c
+@@ -54,7 +54,8 @@
+ 		/* We do not accept a shared mapping if it would violate
+ 		 * cache aliasing constraints.
+ 		 */
+-		if ((flags & MAP_SHARED) && (addr & shm_align_mask))
++		if ((flags & MAP_SHARED) &&
++		    ((addr - (pgoff << PAGE_SHIFT)) & shm_align_mask))
+ 			return -EINVAL;
+ 		return addr;
+ 	}

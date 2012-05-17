@@ -1,0 +1,44 @@
+--- drivers/md/dm-snap.c
++++ drivers/md/dm-snap.c
+@@ -553,6 +553,8 @@
+ 	hash_size = min(origin_dev_size, cow_dev_size) >> s->store->chunk_shift;
+ 	hash_size = min(hash_size, max_buckets);
+ 
++	if (hash_size < 64)
++		hash_size = 64;
+ 	hash_size = rounddown_pow_of_two(hash_size);
+ 	if (init_exception_table(&s->complete, hash_size,
+ 				 DM_CHUNK_CONSECUTIVE_BITS))
+@@ -1152,10 +1154,11 @@
+ 	unsigned sz = 0;
+ 	struct dm_snapshot *snap = ti->private;
+ 
+-	down_write(&snap->lock);
+-
+ 	switch (type) {
+ 	case STATUSTYPE_INFO:
++
++		down_write(&snap->lock);
++
+ 		if (!snap->valid)
+ 			DMEMIT("Invalid");
+ 		else {
+@@ -1171,6 +1174,9 @@
+ 			else
+ 				DMEMIT("Unknown");
+ 		}
++
++		up_write(&snap->lock);
++
+ 		break;
+ 
+ 	case STATUSTYPE_TABLE:
+@@ -1185,8 +1191,6 @@
+ 		break;
+ 	}
+ 
+-	up_write(&snap->lock);
+-
+ 	return 0;
+ }
+ 

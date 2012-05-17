@@ -1,0 +1,125 @@
+--- kernel/cpuset.c
++++ kernel/cpuset.c
+@@ -1392,10 +1395,11 @@
+ 
+ 	if (cs == &top_cpuset) {
+ 		cpumask_copy(cpus_attach, cpu_possible_mask);
++		to = node_possible_map;
+ 	} else {
+ 		guarantee_online_cpus(cs, cpus_attach);
++		guarantee_online_mems(cs, &to);
+ 	}
+-	guarantee_online_mems(cs, &to);
+ 
+ 	/* do per-task migration stuff possibly for each in the threadgroup */
+ 	cpuset_attach_task(tsk, &to, cs);
+@@ -1517,10 +1521,8 @@
+ 		return -ENODEV;
+ 
+ 	trialcs = alloc_trial_cpuset(cs);
+-	if (!trialcs) {
+-		retval = -ENOMEM;
+-		goto out;
+-	}
++	if (!trialcs)
++		return -ENOMEM;
+ 
+ 	switch (cft->private) {
+ 	case FILE_CPULIST:
+@@ -1535,7 +1537,6 @@
+ 	}
+ 
+ 	free_trial_cpuset(trialcs);
+-out:
+ 	cgroup_unlock();
+ 	return retval;
+ }
+@@ -2091,23 +2090,15 @@
+ static int cpuset_track_online_nodes(struct notifier_block *self,
+ 				unsigned long action, void *arg)
+ {
+-	nodemask_t oldmems;
+-
+ 	cgroup_lock();
+ 	switch (action) {
+ 	case MEM_ONLINE:
+-		oldmems = top_cpuset.mems_allowed;
++	case MEM_OFFLINE:
+ 		mutex_lock(&callback_mutex);
+ 		top_cpuset.mems_allowed = node_states[N_HIGH_MEMORY];
+ 		mutex_unlock(&callback_mutex);
+-		update_tasks_nodemask(&top_cpuset, &oldmems, NULL);
+-		break;
+-	case MEM_OFFLINE:
+-		/*
+-		 * needn't update top_cpuset.mems_allowed explicitly because
+-		 * scan_for_empty_cpusets() will update it.
+-		 */
+-		scan_for_empty_cpusets(&top_cpuset);
++		if (action == MEM_OFFLINE)
++			scan_for_empty_cpusets(&top_cpuset);
+ 		break;
+ 	default:
+ 		break;
+@@ -2149,52 +2140,19 @@
+ void cpuset_cpus_allowed(struct task_struct *tsk, struct cpumask *pmask)
+ {
+ 	mutex_lock(&callback_mutex);
+-	task_lock(tsk);
+-	guarantee_online_cpus(task_cs(tsk), pmask);
+-	task_unlock(tsk);
++	cpuset_cpus_allowed_locked(tsk, pmask);
+ 	mutex_unlock(&callback_mutex);
+ }
+ 
+-int cpuset_cpus_allowed_fallback(struct task_struct *tsk)
++/**
++ * cpuset_cpus_allowed_locked - return cpus_allowed mask from a tasks cpuset.
++ * Must be called with callback_mutex held.
++ **/
++void cpuset_cpus_allowed_locked(struct task_struct *tsk, struct cpumask *pmask)
+ {
+-	const struct cpuset *cs;
+-	int cpu;
+-
+-	rcu_read_lock();
+-	cs = task_cs(tsk);
+-	if (cs)
+-		cpumask_copy(&tsk->cpus_allowed, cs->cpus_allowed);
+-	rcu_read_unlock();
+-
+-	/*
+-	 * We own tsk->cpus_allowed, nobody can change it under us.
+-	 *
+-	 * But we used cs && cs->cpus_allowed lockless and thus can
+-	 * race with cgroup_attach_task() or update_cpumask() and get
+-	 * the wrong tsk->cpus_allowed. However, both cases imply the
+-	 * subsequent cpuset_change_cpumask()->set_cpus_allowed_ptr()
+-	 * which takes task_rq_lock().
+-	 *
+-	 * If we are called after it dropped the lock we must see all
+-	 * changes in tsk_cs()->cpus_allowed. Otherwise we can temporary
+-	 * set any mask even if it is not right from task_cs() pov,
+-	 * the pending set_cpus_allowed_ptr() will fix things.
+-	 */
+-
+-	cpu = cpumask_any_and(&tsk->cpus_allowed, cpu_active_mask);
+-	if (cpu >= nr_cpu_ids) {
+-		/*
+-		 * Either tsk->cpus_allowed is wrong (see above) or it
+-		 * is actually empty. The latter case is only possible
+-		 * if we are racing with remove_tasks_in_empty_cpuset().
+-		 * Like above we can temporary set any mask and rely on
+-		 * set_cpus_allowed_ptr() as synchronization point.
+-		 */
+-		cpumask_copy(&tsk->cpus_allowed, cpu_possible_mask);
+-		cpu = cpumask_any(cpu_active_mask);
+-	}
+-
+-	return cpu;
++	task_lock(tsk);
++	guarantee_online_cpus(task_cs(tsk), pmask);
++	task_unlock(tsk);
+ }
+ 
+ void cpuset_init_current_mems_allowed(void)

@@ -117,7 +117,6 @@
 #define B43_MMIO_TSF_2			0x636	/* core rev < 3 only */
 #define B43_MMIO_TSF_3			0x638	/* core rev < 3 only */
 #define B43_MMIO_RNG			0x65A
-#define B43_MMIO_IFSSLOT		0x684	/* Interframe slot time */
 #define B43_MMIO_IFSCTL			0x688 /* Interframe space control */
 #define  B43_MMIO_IFSCTL_USE_EDCF	0x0004
 #define B43_MMIO_POWERUP_DELAY		0x6A8
@@ -749,6 +748,12 @@ struct b43_wldev {
 	unsigned int rx_count;
 #endif
 };
+
+/*
+ * Include goes here to avoid a dependency problem.
+ * A better fix would be to integrate xmit.h into b43.h.
+ */
+#include "xmit.h"
 
 /*
  * Include goes here to avoid a dependency problem.

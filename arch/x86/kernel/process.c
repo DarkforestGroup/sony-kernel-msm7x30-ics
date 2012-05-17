@@ -91,6 +91,18 @@ void flush_thread(void)
 {
 	struct task_struct *tsk = current;
 
+#ifdef CONFIG_X86_64
+	if (test_tsk_thread_flag(tsk, TIF_ABI_PENDING)) {
+		clear_tsk_thread_flag(tsk, TIF_ABI_PENDING);
+		if (test_tsk_thread_flag(tsk, TIF_IA32)) {
+			clear_tsk_thread_flag(tsk, TIF_IA32);
+		} else {
+			set_tsk_thread_flag(tsk, TIF_IA32);
+			current_thread_info()->status |= TS_COMPAT;
+		}
+	}
+#endif
+
 	clear_tsk_thread_flag(tsk, TIF_DEBUG);
 
 	tsk->thread.debugreg0 = 0;
@@ -436,6 +448,24 @@ static int __cpuinit mwait_usable(const struct cpuinfo_x86 *c)
 	 * C1  supports MWAIT
 	 */
 	return (edx & MWAIT_EDX_C1);
+}
+
+/*
+ * Check for AMD CPUs, which have potentially C1E support
+ */
+static int __cpuinit check_c1e_idle(const struct cpuinfo_x86 *c)
+{
+	if (c->x86_vendor != X86_VENDOR_AMD)
+		return 0;
+
+	if (c->x86 < 0x0F)
+		return 0;
+
+	/* Family 0x0f models < rev F do not have C1E */
+	if (c->x86 == 0x0f && c->x86_model < 0x40)
+		return 0;
+
+	return 1;
 }
 
 /*

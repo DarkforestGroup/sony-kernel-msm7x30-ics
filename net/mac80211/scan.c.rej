@@ -1,0 +1,18 @@
+--- net/mac80211/scan.c
++++ net/mac80211/scan.c
+@@ -204,13 +202,12 @@
+ 	cancel_work_sync(&local->dynamic_ps_enable_work);
+ 
+ 	if (local->hw.conf.flags & IEEE80211_CONF_PS) {
+-		local->scan_ps_enabled = true;
++		ps = true;
+ 		local->hw.conf.flags &= ~IEEE80211_CONF_PS;
+ 		ieee80211_hw_config(local, IEEE80211_CONF_CHANGE_PS);
+ 	}
+ 
+-	if (!(local->scan_ps_enabled) ||
+-	    !(local->hw.flags & IEEE80211_HW_PS_NULLFUNC_STACK))
++	if (!ps || !(local->hw.flags & IEEE80211_HW_PS_NULLFUNC_STACK))
+ 		/*
+ 		 * If power save was enabled, no need to send a nullfunc
+ 		 * frame because AP knows that we are sleeping. But if the

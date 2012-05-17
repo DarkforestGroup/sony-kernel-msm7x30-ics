@@ -1,0 +1,74 @@
+--- fs/ext4/extents.c
++++ fs/ext4/extents.c
+@@ -3057,15 +2993,13 @@
+ 		if (io)
+ 			io->flag = DIO_AIO_UNWRITTEN;
+ 		else
+-			ext4_set_inode_state(inode, EXT4_STATE_DIO_UNWRITTEN);
++			EXT4_I(inode)->i_state |= EXT4_STATE_DIO_UNWRITTEN;
+ 		goto out;
+ 	}
+ 	/* async DIO end_io complete, convert the filled extent to written */
+ 	if (flags == EXT4_GET_BLOCKS_DIO_CONVERT_EXT) {
+ 		ret = ext4_convert_unwritten_extents_dio(handle, inode,
+ 							path);
+-		if (ret >= 0)
+-			ext4_update_inode_fsync_trans(handle, inode, 1);
+ 		goto out2;
+ 	}
+ 	/* buffered IO case */
+@@ -3329,27 +3205,12 @@
+ 	/* previous routine could use block we allocated */
+ 	newblock = ext_pblock(&newex);
+ 	allocated = ext4_ext_get_actual_len(&newex);
+-	if (allocated > max_blocks)
+-		allocated = max_blocks;
+ 	set_buffer_new(bh_result);
+ 
+-	/*
+-	 * Update reserved blocks/metadata blocks after successful
+-	 * block allocation which had been deferred till now.
+-	 */
+-	if (flags & EXT4_GET_BLOCKS_DELALLOC_RESERVE)
+-		ext4_da_update_reserve_space(inode, allocated, 1);
+-
+-	/*
+-	 * Cache the extent and update transaction to commit on fdatasync only
+-	 * when it is _not_ an uninitialized extent.
+-	 */
+-	if ((flags & EXT4_GET_BLOCKS_UNINIT_EXT) == 0) {
++	/* Cache only when it is _not_ an uninitialized extent */
++	if ((flags & EXT4_GET_BLOCKS_UNINIT_EXT) == 0)
+ 		ext4_ext_put_in_cache(inode, iblock, allocated, newblock,
+ 						EXT4_EXT_CACHE_EXTENT);
+-		ext4_update_inode_fsync_trans(handle, inode, 1);
+-	} else
+-		ext4_update_inode_fsync_trans(handle, inode, 0);
+ out:
+ 	if (allocated > max_blocks)
+ 		allocated = max_blocks;
+@@ -3730,21 +3579,17 @@
+ 	if (fieinfo->fi_flags & FIEMAP_FLAG_XATTR) {
+ 		error = ext4_xattr_fiemap(inode, fieinfo);
+ 	} else {
+-		ext4_lblk_t len_blks;
+-		__u64 last_blk;
+-
+ 		start_blk = start >> inode->i_sb->s_blocksize_bits;
+-		last_blk = (start + len - 1) >> inode->i_sb->s_blocksize_bits;
+-		if (last_blk >= EXT_MAX_BLOCK)
+-			last_blk = EXT_MAX_BLOCK-1;
+-		len_blks = ((ext4_lblk_t) last_blk) - start_blk + 1;
++		len_blks = len >> inode->i_sb->s_blocksize_bits;
+ 
+ 		/*
+ 		 * Walk the extent tree gathering extent information.
+ 		 * ext4_ext_fiemap_cb will push extents back to user.
+ 		 */
++		down_read(&EXT4_I(inode)->i_data_sem);
+ 		error = ext4_ext_walk_space(inode, start_blk, len_blks,
+ 					  ext4_ext_fiemap_cb, fieinfo);
++		up_read(&EXT4_I(inode)->i_data_sem);
+ 	}
+ 
+ 	return error;

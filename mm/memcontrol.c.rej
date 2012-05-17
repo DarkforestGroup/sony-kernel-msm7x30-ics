@@ -1,0 +1,17 @@
+--- mm/memcontrol.c
++++ mm/memcontrol.c
+@@ -2002,12 +1996,12 @@
+ 	}
+ 	unlock_page_cgroup(pc);
+ 
+-	*ptr = mem;
+ 	if (mem) {
+-		ret = __mem_cgroup_try_charge(NULL, GFP_KERNEL, ptr, false,
++		ret = __mem_cgroup_try_charge(NULL, GFP_KERNEL, &mem, false,
+ 						page);
+ 		css_put(&mem->css);
+ 	}
++	*ptr = mem;
+ 	return ret;
+ }
+ 

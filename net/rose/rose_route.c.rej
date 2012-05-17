@@ -1,0 +1,28 @@
+--- net/rose/rose_route.c
++++ net/rose/rose_route.c
+@@ -234,6 +234,8 @@
+ 
+ 	if ((s = rose_neigh_list) == rose_neigh) {
+ 		rose_neigh_list = rose_neigh->next;
++		if (rose_neigh->ax25)
++			ax25_cb_put(rose_neigh->ax25);
+ 		kfree(rose_neigh->digipeat);
+ 		kfree(rose_neigh);
+ 		return;
+@@ -242,6 +244,8 @@
+ 	while (s != NULL && s->next != NULL) {
+ 		if (s->next == rose_neigh) {
+ 			s->next = rose_neigh->next;
++			if (rose_neigh->ax25)
++				ax25_cb_put(rose_neigh->ax25);
+ 			kfree(rose_neigh->digipeat);
+ 			kfree(rose_neigh);
+ 			return;
+@@ -810,6 +814,7 @@
+ 
+ 	if (rose_neigh != NULL) {
+ 		rose_neigh->ax25 = NULL;
++		ax25_cb_put(ax25);
+ 
+ 		rose_del_route_by_neigh(rose_neigh);
+ 		rose_kill_by_neigh(rose_neigh);

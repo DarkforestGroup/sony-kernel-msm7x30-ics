@@ -1,0 +1,27 @@
+--- drivers/md/dm-table.c
++++ drivers/md/dm-table.c
+@@ -1079,10 +1063,24 @@
+ 			       struct queue_limits *limits)
+ {
+ 	/*
++	 * Each target device in the table has a data area that should normally
++	 * be aligned such that the DM device's alignment_offset is 0.
++	 * FIXME: Propagate alignment_offsets up the stack and warn of
++	 *	  sub-optimal or inconsistent settings.
++	 */
++	limits->alignment_offset = 0;
++	limits->misaligned = 0;
++
++	/*
+ 	 * Copy table's limits to the DM device's request_queue
+ 	 */
+ 	q->limits = *limits;
+ 
++	if (limits->no_cluster)
++		queue_flag_clear_unlocked(QUEUE_FLAG_CLUSTER, q);
++	else
++		queue_flag_set_unlocked(QUEUE_FLAG_CLUSTER, q);
++
+ 	dm_table_set_integrity(t);
+ 
+ 	/*

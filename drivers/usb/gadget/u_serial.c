@@ -819,6 +819,11 @@ static int gs_open(struct tty_struct *tty, struct file *file)
 	 */
 	tty->low_latency = 1;
 
+	/* low_latency means ldiscs work in tasklet context, without
+	 * needing a workqueue schedule ... easier to keep up.
+	 */
+	tty->low_latency = 1;
+
 	/* if connected, start the I/O stream */
 	if (port->port_usb) {
 		struct gserial	*gser = port->port_usb;

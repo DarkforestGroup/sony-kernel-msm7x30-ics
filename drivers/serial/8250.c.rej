@@ -1,0 +1,12 @@
+--- drivers/serial/8250.c
++++ drivers/serial/8250.c
+@@ -252,8 +249,7 @@
+ 		.fifo_size	= 128,
+ 		.tx_loadsz	= 128,
+ 		.fcr		= UART_FCR_ENABLE_FIFO | UART_FCR_R_TRIG_10,
+-		/* UART_CAP_EFR breaks billionon CF bluetooth card. */
+-		.flags		= UART_CAP_FIFO | UART_CAP_SLEEP,
++		.flags		= UART_CAP_FIFO | UART_CAP_EFR | UART_CAP_SLEEP,
+ 	},
+ 	[PORT_RSA] = {
+ 		.name		= "RSA",

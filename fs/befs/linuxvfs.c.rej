@@ -1,0 +1,10 @@
+--- fs/befs/linuxvfs.c
++++ fs/befs/linuxvfs.c
+@@ -878,6 +883,7 @@
+ 	brelse(bh);
+ 
+       unacquire_priv_sbp:
++	kfree(befs_sb->mount_opts.iocharset);
+ 	kfree(sb->s_fs_info);
+ 
+       unacquire_none:

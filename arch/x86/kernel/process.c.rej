@@ -1,0 +1,12 @@
+--- arch/x86/kernel/process.c
++++ arch/x86/kernel/process.c
+@@ -545,8 +575,7 @@
+ 		 */
+ 		printk(KERN_INFO "using mwait in idle threads.\n");
+ 		pm_idle = mwait_idle;
+-	} else if (cpu_has_amd_erratum(amd_erratum_400)) {
+-		/* E400: APIC timer interrupt does not wake up CPU from C1e */
++	} else if (check_c1e_idle(c)) {
+ 		printk(KERN_INFO "using C1E aware idle routine\n");
+ 		pm_idle = c1e_idle;
+ 	} else

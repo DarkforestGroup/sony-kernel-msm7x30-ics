@@ -1,0 +1,11 @@
+--- net/mac80211/driver-trace.h
++++ net/mac80211/driver-trace.h
+@@ -655,7 +655,7 @@
+ 		__entry->ret = ret;
+ 		__entry->action = action;
+ 		__entry->tid = tid;
+-		__entry->ssn = *ssn;
++		__entry->ssn = ssn ? *ssn : 0;
+ 	),
+ 
+ 	TP_printk(

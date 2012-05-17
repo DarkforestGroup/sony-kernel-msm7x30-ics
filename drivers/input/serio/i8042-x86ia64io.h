@@ -67,12 +67,10 @@ static inline void i8042_write_command(int val)
 
 #include <linux/dmi.h>
 
-static const struct dmi_system_id __initconst i8042_dmi_noloop_table[] = {
+static struct dmi_system_id __initdata i8042_dmi_noloop_table[] = {
 	{
-		/*
-		 * Arima-Rioworks HDAMB -
-		 * AUX LOOP command does not raise AUX IRQ
-		 */
+		/* AUX LOOP command does not raise AUX IRQ */
+		.ident = "Arima-Rioworks HDAMB",
 		.matches = {
 			DMI_MATCH(DMI_BOARD_VENDOR, "RIOWORKS"),
 			DMI_MATCH(DMI_BOARD_NAME, "HDAMB"),
@@ -80,7 +78,7 @@ static const struct dmi_system_id __initconst i8042_dmi_noloop_table[] = {
 		},
 	},
 	{
-		/* ASUS G1S */
+		.ident = "ASUS G1S",
 		.matches = {
 			DMI_MATCH(DMI_BOARD_VENDOR, "ASUSTeK Computer Inc."),
 			DMI_MATCH(DMI_BOARD_NAME, "G1S"),
@@ -88,7 +86,8 @@ static const struct dmi_system_id __initconst i8042_dmi_noloop_table[] = {
 		},
 	},
 	{
-		/* ASUS P65UP5 - AUX LOOP command does not raise AUX IRQ */
+		/* AUX LOOP command does not raise AUX IRQ */
+		.ident = "ASUS P65UP5",
 		.matches = {
 			DMI_MATCH(DMI_BOARD_VENDOR, "ASUSTeK Computer INC."),
 			DMI_MATCH(DMI_BOARD_NAME, "P/I-P65UP5"),
@@ -96,6 +95,7 @@ static const struct dmi_system_id __initconst i8042_dmi_noloop_table[] = {
 		},
 	},
 	{
+		.ident = "Compaq Proliant 8500",
 		.matches = {
 			DMI_MATCH(DMI_SYS_VENDOR, "Compaq"),
 			DMI_MATCH(DMI_PRODUCT_NAME , "ProLiant"),
@@ -103,6 +103,7 @@ static const struct dmi_system_id __initconst i8042_dmi_noloop_table[] = {
 		},
 	},
 	{
+		.ident = "Compaq Proliant DL760",
 		.matches = {
 			DMI_MATCH(DMI_SYS_VENDOR, "Compaq"),
 			DMI_MATCH(DMI_PRODUCT_NAME , "ProLiant"),
@@ -110,7 +111,7 @@ static const struct dmi_system_id __initconst i8042_dmi_noloop_table[] = {
 		},
 	},
 	{
-		/* OQO Model 01 */
+		.ident = "OQO Model 01",
 		.matches = {
 			DMI_MATCH(DMI_SYS_VENDOR, "OQO"),
 			DMI_MATCH(DMI_PRODUCT_NAME, "ZEPTO"),
@@ -118,7 +119,8 @@ static const struct dmi_system_id __initconst i8042_dmi_noloop_table[] = {
 		},
 	},
 	{
-		/* ULI EV4873 - AUX LOOP does not work properly */
+		/* AUX LOOP does not work properly */
+		.ident = "ULI EV4873",
 		.matches = {
 			DMI_MATCH(DMI_SYS_VENDOR, "ULI"),
 			DMI_MATCH(DMI_PRODUCT_NAME, "EV4873"),
@@ -126,7 +128,7 @@ static const struct dmi_system_id __initconst i8042_dmi_noloop_table[] = {
 		},
 	},
 	{
-		/* Microsoft Virtual Machine */
+		.ident = "Microsoft Virtual Machine",
 		.matches = {
 			DMI_MATCH(DMI_SYS_VENDOR, "Microsoft Corporation"),
 			DMI_MATCH(DMI_PRODUCT_NAME, "Virtual Machine"),
@@ -134,7 +136,7 @@ static const struct dmi_system_id __initconst i8042_dmi_noloop_table[] = {
 		},
 	},
 	{
-		/* Medion MAM 2070 */
+		.ident = "Medion MAM 2070",
 		.matches = {
 			DMI_MATCH(DMI_SYS_VENDOR, "Notebook"),
 			DMI_MATCH(DMI_PRODUCT_NAME, "MAM 2070"),
@@ -142,7 +144,7 @@ static const struct dmi_system_id __initconst i8042_dmi_noloop_table[] = {
 		},
 	},
 	{
-		/* Blue FB5601 */
+		.ident = "Blue FB5601",
 		.matches = {
 			DMI_MATCH(DMI_SYS_VENDOR, "blue"),
 			DMI_MATCH(DMI_PRODUCT_NAME, "FB5601"),
@@ -150,7 +152,7 @@ static const struct dmi_system_id __initconst i8042_dmi_noloop_table[] = {
 		},
 	},
 	{
-		/* Gigabyte M912 */
+		.ident = "Gigabyte M912",
 		.matches = {
 			DMI_MATCH(DMI_SYS_VENDOR, "GIGABYTE"),
 			DMI_MATCH(DMI_PRODUCT_NAME, "M912"),
@@ -182,72 +184,72 @@ static const struct dmi_system_id __initconst i8042_dmi_noloop_table[] = {
  * ... apparently some Toshibas don't like MUX mode either and
  * die horrible death on reboot.
  */
-static const struct dmi_system_id __initconst i8042_dmi_nomux_table[] = {
+static struct dmi_system_id __initdata i8042_dmi_nomux_table[] = {
 	{
-		/* Fujitsu Lifebook P7010/P7010D */
+		.ident = "Fujitsu Lifebook P7010/P7010D",
 		.matches = {
 			DMI_MATCH(DMI_SYS_VENDOR, "FUJITSU"),
 			DMI_MATCH(DMI_PRODUCT_NAME, "P7010"),
 		},
 	},
 	{
-		/* Fujitsu Lifebook P7010 */
+		.ident = "Fujitsu Lifebook P7010",
 		.matches = {
 			DMI_MATCH(DMI_SYS_VENDOR, "FUJITSU SIEMENS"),
 			DMI_MATCH(DMI_PRODUCT_NAME, "0000000000"),
 		},
 	},
 	{
-		/* Fujitsu Lifebook P5020D */
+		.ident = "Fujitsu Lifebook P5020D",
 		.matches = {
 			DMI_MATCH(DMI_SYS_VENDOR, "FUJITSU"),
 			DMI_MATCH(DMI_PRODUCT_NAME, "LifeBook P Series"),
 		},
 	},
 	{
-		/* Fujitsu Lifebook S2000 */
+		.ident = "Fujitsu Lifebook S2000",
 		.matches = {
 			DMI_MATCH(DMI_SYS_VENDOR, "FUJITSU"),
 			DMI_MATCH(DMI_PRODUCT_NAME, "LifeBook S Series"),
 		},
 	},
 	{
-		/* Fujitsu Lifebook S6230 */
+		.ident = "Fujitsu Lifebook S6230",
 		.matches = {
 			DMI_MATCH(DMI_SYS_VENDOR, "FUJITSU"),
 			DMI_MATCH(DMI_PRODUCT_NAME, "LifeBook S6230"),
 		},
 	},
 	{
-		/* Fujitsu T70H */
+		.ident = "Fujitsu T70H",
 		.matches = {
 			DMI_MATCH(DMI_SYS_VENDOR, "FUJITSU"),
 			DMI_MATCH(DMI_PRODUCT_NAME, "FMVLT70H"),
 		},
 	},
 	{
-		/* Fujitsu-Siemens Lifebook T3010 */
+		.ident = "Fujitsu-Siemens Lifebook T3010",
 		.matches = {
 			DMI_MATCH(DMI_SYS_VENDOR, "FUJITSU SIEMENS"),
 			DMI_MATCH(DMI_PRODUCT_NAME, "LIFEBOOK T3010"),
 		},
 	},
 	{
-		/* Fujitsu-Siemens Lifebook E4010 */
+		.ident = "Fujitsu-Siemens Lifebook E4010",
 		.matches = {
 			DMI_MATCH(DMI_SYS_VENDOR, "FUJITSU SIEMENS"),
 			DMI_MATCH(DMI_PRODUCT_NAME, "LIFEBOOK E4010"),
 		},
 	},
 	{
-		/* Fujitsu-Siemens Amilo Pro 2010 */
+		.ident = "Fujitsu-Siemens Amilo Pro 2010",
 		.matches = {
 			DMI_MATCH(DMI_SYS_VENDOR, "FUJITSU SIEMENS"),
 			DMI_MATCH(DMI_PRODUCT_NAME, "AMILO Pro V2010"),
 		},
 	},
 	{
-		/* Fujitsu-Siemens Amilo Pro 2030 */
+		.ident = "Fujitsu-Siemens Amilo Pro 2030",
 		.matches = {
 			DMI_MATCH(DMI_SYS_VENDOR, "FUJITSU SIEMENS"),
 			DMI_MATCH(DMI_PRODUCT_NAME, "AMILO PRO V2030"),
@@ -258,7 +260,7 @@ static const struct dmi_system_id __initconst i8042_dmi_nomux_table[] = {
 		 * No data is coming from the touchscreen unless KBC
 		 * is in legacy mode.
 		 */
-		/* Panasonic CF-29 */
+		.ident = "Panasonic CF-29",
 		.matches = {
 			DMI_MATCH(DMI_SYS_VENDOR, "Matsushita"),
 			DMI_MATCH(DMI_PRODUCT_NAME, "CF-29"),
@@ -266,10 +268,10 @@ static const struct dmi_system_id __initconst i8042_dmi_nomux_table[] = {
 	},
 	{
 		/*
-		 * HP Pavilion DV4017EA -
-		 * errors on MUX ports are reported without raising AUXDATA
+		 * Errors on MUX ports are reported without raising AUXDATA
 		 * causing "spurious NAK" messages.
 		 */
+		.ident = "HP Pavilion DV4017EA",
 		.matches = {
 			DMI_MATCH(DMI_SYS_VENDOR, "Hewlett-Packard"),
 			DMI_MATCH(DMI_PRODUCT_NAME, "Pavilion dv4000 (EA032EA#ABF)"),
@@ -277,9 +279,9 @@ static const struct dmi_system_id __initconst i8042_dmi_nomux_table[] = {
 	},
 	{
 		/*
-		 * HP Pavilion ZT1000 -
-		 * like DV4017EA does not raise AUXERR for errors on MUX ports.
+		 * Like DV4017EA does not raise AUXERR for errors on MUX ports.
 		 */
+		.ident = "HP Pavilion ZT1000",
 		.matches = {
 			DMI_MATCH(DMI_SYS_VENDOR, "Hewlett-Packard"),
 			DMI_MATCH(DMI_PRODUCT_NAME, "HP Pavilion Notebook PC"),
@@ -473,16 +475,16 @@ static const struct dmi_system_id __initconst i8042_dmi_reset_table[] = {
 };
 
 #ifdef CONFIG_PNP
-static const struct dmi_system_id __initconst i8042_dmi_nopnp_table[] = {
+static struct dmi_system_id __initdata i8042_dmi_nopnp_table[] = {
 	{
-		/* Intel MBO Desktop D845PESV */
+		.ident = "Intel MBO Desktop D845PESV",
 		.matches = {
 			DMI_MATCH(DMI_BOARD_NAME, "D845PESV"),
 			DMI_MATCH(DMI_BOARD_VENDOR, "Intel Corporation"),
 		},
 	},
 	{
-		/* MSI Wind U-100 */
+		.ident = "MSI Wind U-100",
 		.matches = {
 			DMI_MATCH(DMI_BOARD_NAME, "U-100"),
 			DMI_MATCH(DMI_BOARD_VENDOR, "MICRO-STAR INTERNATIONAL CO., LTD"),
@@ -491,23 +493,27 @@ static const struct dmi_system_id __initconst i8042_dmi_nopnp_table[] = {
 	{ }
 };
 
-static const struct dmi_system_id __initconst i8042_dmi_laptop_table[] = {
+static struct dmi_system_id __initdata i8042_dmi_laptop_table[] = {
 	{
+		.ident = "Portable",
 		.matches = {
 			DMI_MATCH(DMI_CHASSIS_TYPE, "8"), /* Portable */
 		},
 	},
 	{
+		.ident = "Laptop",
 		.matches = {
 			DMI_MATCH(DMI_CHASSIS_TYPE, "9"), /* Laptop */
 		},
 	},
 	{
+		.ident = "Notebook",
 		.matches = {
 			DMI_MATCH(DMI_CHASSIS_TYPE, "10"), /* Notebook */
 		},
 	},
 	{
+		.ident = "Sub-Notebook",
 		.matches = {
 			DMI_MATCH(DMI_CHASSIS_TYPE, "14"), /* Sub-Notebook */
 		},

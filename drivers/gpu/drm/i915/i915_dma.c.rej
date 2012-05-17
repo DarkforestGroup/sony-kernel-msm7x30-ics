@@ -1,0 +1,54 @@
+--- drivers/gpu/drm/i915/i915_dma.c
++++ drivers/gpu/drm/i915/i915_dma.c
+@@ -683,10 +683,8 @@
+ 		ret = copy_from_user(cliprects, batch->cliprects,
+ 				     batch->num_cliprects *
+ 				     sizeof(struct drm_clip_rect));
+-		if (ret != 0) {
+-			ret = -EFAULT;
++		if (ret != 0)
+ 			goto fail_free;
+-		}
+ 	}
+ 
+ 	mutex_lock(&dev->struct_mutex);
+@@ -727,10 +725,8 @@
+ 		return -ENOMEM;
+ 
+ 	ret = copy_from_user(batch_data, cmdbuf->buf, cmdbuf->sz);
+-	if (ret != 0) {
+-		ret = -EFAULT;
++	if (ret != 0)
+ 		goto fail_batch_free;
+-	}
+ 
+ 	if (cmdbuf->num_cliprects) {
+ 		cliprects = kcalloc(cmdbuf->num_cliprects,
+@@ -741,10 +737,8 @@
+ 		ret = copy_from_user(cliprects, cmdbuf->cliprects,
+ 				     cmdbuf->num_cliprects *
+ 				     sizeof(struct drm_clip_rect));
+-		if (ret != 0) {
+-			ret = -EFAULT;
++		if (ret != 0)
+ 			goto fail_clip_free;
+-		}
+ 	}
+ 
+ 	mutex_lock(&dev->struct_mutex);
+@@ -1531,15 +1524,6 @@
+ 	}
+ 
+ 	if (drm_core_check_feature(dev, DRIVER_MODESET)) {
+-		/*
+-		 * free the memory space allocated for the child device
+-		 * config parsed from VBT
+-		 */
+-		if (dev_priv->child_dev && dev_priv->child_dev_num) {
+-			kfree(dev_priv->child_dev);
+-			dev_priv->child_dev = NULL;
+-			dev_priv->child_dev_num = 0;
+-		}
+ 		drm_irq_uninstall(dev);
+ 		vga_client_register(dev->pdev, NULL, NULL, NULL);
+ 	}

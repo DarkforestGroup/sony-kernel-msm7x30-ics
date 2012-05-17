@@ -150,9 +150,7 @@ walk:
 		walker->table_gfn[walker->level - 1] = table_gfn;
 		walker->pte_gpa[walker->level - 1] = pte_gpa;
 
-		if (kvm_read_guest(vcpu->kvm, pte_gpa, &pte, sizeof(pte)))
-			goto not_present;
-
+		kvm_read_guest(vcpu->kvm, pte_gpa, &pte, sizeof(pte));
 		trace_kvm_mmu_paging_element(pte, walker->level);
 
 		if (!is_present_gpte(pte))
@@ -457,6 +455,8 @@ out_unlock:
 static void FNAME(invlpg)(struct kvm_vcpu *vcpu, gva_t gva)
 {
 	struct kvm_shadow_walk_iterator iterator;
+	pt_element_t gpte;
+	gpa_t pte_gpa = -1;
 	int level;
 	u64 *sptep;
 	int need_flush = 0;
@@ -471,6 +471,10 @@ static void FNAME(invlpg)(struct kvm_vcpu *vcpu, gva_t gva)
 		if (level == PT_PAGE_TABLE_LEVEL  ||
 		    ((level == PT_DIRECTORY_LEVEL && is_large_pte(*sptep))) ||
 		    ((level == PT_PDPE_LEVEL && is_large_pte(*sptep)))) {
+			struct kvm_mmu_page *sp = page_header(__pa(sptep));
+
+			pte_gpa = (sp->gfn << PAGE_SHIFT);
+			pte_gpa += (sptep - sp->spt) * sizeof(pt_element_t);
 
 			if (is_shadow_present_pte(*sptep)) {
 				rmap_remove(vcpu->kvm, sptep);

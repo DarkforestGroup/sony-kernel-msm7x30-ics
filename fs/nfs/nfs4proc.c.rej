@@ -1,0 +1,11 @@
+--- fs/nfs/nfs4proc.c
++++ fs/nfs/nfs4proc.c
+@@ -1573,8 +1562,6 @@
+ 	status = PTR_ERR(state);
+ 	if (IS_ERR(state))
+ 		goto err_opendata_put;
+-	if (server->caps & NFS_CAP_POSIX_LOCK)
+-		set_bit(NFS_STATE_POSIX_LOCKS, &state->flags);
+ 	nfs4_opendata_put(opendata);
+ 	nfs4_put_state_owner(sp);
+ 	*res = state;

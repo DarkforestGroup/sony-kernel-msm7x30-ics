@@ -1,0 +1,11 @@
+--- net/ipv4/netfilter/nf_conntrack_l3proto_ipv4.c
++++ net/ipv4/netfilter/nf_conntrack_l3proto_ipv4.c
+@@ -213,7 +213,7 @@
+ 	{
+ 		.ctl_name	= NET_IPV4_NF_CONNTRACK_BUCKETS,
+ 		.procname	= "ip_conntrack_buckets",
+-		.data		= &nf_conntrack_htable_size,
++		.data		= &init_net.ct.htable_size,
+ 		.maxlen		= sizeof(unsigned int),
+ 		.mode		= 0444,
+ 		.proc_handler	= proc_dointvec,

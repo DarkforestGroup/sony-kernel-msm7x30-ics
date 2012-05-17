@@ -1,0 +1,10 @@
+--- sound/soc/codecs/wm8940.c
++++ sound/soc/codecs/wm8940.c
+@@ -472,7 +472,6 @@
+ 		ret = snd_soc_write(codec, WM8940_POWER1, pwr_reg);
+ 		break;
+ 	}
+-	codec->bias_level = level;
+ 
+ 	return ret;
+ }

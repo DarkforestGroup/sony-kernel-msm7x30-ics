@@ -1,0 +1,22 @@
+--- net/mac80211/cfg.c
++++ net/mac80211/cfg.c
+@@ -338,7 +338,8 @@
+ 	sinfo->rx_packets = sta->rx_packets;
+ 	sinfo->tx_packets = sta->tx_packets;
+ 
+-	if (sta->local->hw.flags & IEEE80211_HW_SIGNAL_DBM) {
++	if ((sta->local->hw.flags & IEEE80211_HW_SIGNAL_DBM) ||
++	    (sta->local->hw.flags & IEEE80211_HW_SIGNAL_UNSPEC)) {
+ 		sinfo->filled |= STATION_INFO_SIGNAL;
+ 		sinfo->signal = (s8)sta->last_signal;
+ 	}
+@@ -1305,6 +1306,9 @@
+ 	struct ieee80211_local *local = wdev_priv(dev->ieee80211_ptr);
+ 	struct ieee80211_conf *conf = &local->hw.conf;
+ 
++	if (sdata->vif.type != NL80211_IFTYPE_STATION)
++		return -EOPNOTSUPP;
++
+ 	if (!(local->hw.flags & IEEE80211_HW_SUPPORTS_PS))
+ 		return -EOPNOTSUPP;
+ 

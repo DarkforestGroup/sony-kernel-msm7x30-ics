@@ -1,0 +1,10 @@
+--- arch/x86/kernel/cpu/cpufreq/powernow-k8.c
++++ arch/x86/kernel/cpu/cpufreq/powernow-k8.c
+@@ -1352,6 +1353,7 @@
+ 
+ 	kfree(data->powernow_table);
+ 	kfree(data);
++	per_cpu(powernow_data, pol->cpu) = NULL;
+ 
+ 	return 0;
+ }

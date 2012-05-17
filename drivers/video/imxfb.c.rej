@@ -1,0 +1,22 @@
+--- drivers/video/imxfb.c
++++ drivers/video/imxfb.c
+@@ -593,7 +593,8 @@
+  */
+ static int imxfb_suspend(struct platform_device *dev, pm_message_t state)
+ {
+-	struct imxfb_info *fbi = platform_get_drvdata(dev);
++	struct fb_info *info = platform_get_drvdata(dev);
++	struct imxfb_info *fbi = info->par;
+ 
+ 	pr_debug("%s\n", __func__);
+ 
+@@ -603,7 +604,8 @@
+ 
+ static int imxfb_resume(struct platform_device *dev)
+ {
+-	struct imxfb_info *fbi = platform_get_drvdata(dev);
++	struct fb_info *info = platform_get_drvdata(dev);
++	struct imxfb_info *fbi = info->par;
+ 
+ 	pr_debug("%s\n", __func__);
+ 

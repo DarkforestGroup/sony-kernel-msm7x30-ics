@@ -851,6 +851,8 @@ int i2c_del_adapter(struct i2c_adapter *adap)
 	idr_remove(&i2c_adapter_idr, adap->nr);
 	mutex_unlock(&core_lock);
 
+	dev_dbg(&adap->dev, "adapter [%s] unregistered\n", adap->name);
+
 	/* Clear the device structure in case this adapter is ever going to be
 	   added again */
 	memset(&adap->dev, 0, sizeof(adap->dev));

@@ -1,0 +1,10 @@
+--- fs/binfmt_flat.c
++++ fs/binfmt_flat.c
+@@ -519,6 +519,7 @@
+ 
+ 		/* OK, This is the point of no return */
+ 		set_personality(PER_LINUX_32BIT);
++		setup_new_exec(bprm);
+ 	}
+ 
+ 	/*

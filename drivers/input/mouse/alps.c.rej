@@ -1,0 +1,16 @@
+--- drivers/input/mouse/alps.c
++++ drivers/input/mouse/alps.c
+@@ -55,12 +52,8 @@
+ 	{ { 0x20, 0x02, 0x0e },	0xf8, 0xf8, ALPS_PASS | ALPS_DUALPOINT }, /* XXX */
+ 	{ { 0x22, 0x02, 0x0a },	0xf8, 0xf8, ALPS_PASS | ALPS_DUALPOINT },
+ 	{ { 0x22, 0x02, 0x14 }, 0xff, 0xff, ALPS_PASS | ALPS_DUALPOINT }, /* Dell Latitude D600 */
+-	/* Dell Latitude E5500, E6400, E6500, Precision M4400 */
+-	{ { 0x62, 0x02, 0x14 }, 0xcf, 0xcf,
+-		ALPS_PASS | ALPS_DUALPOINT | ALPS_PS2_INTERLEAVED },
++	{ { 0x62, 0x02, 0x14 }, 0xcf, 0xcf, ALPS_PASS | ALPS_DUALPOINT }, /* Dell Latitude E6500 */
+ 	{ { 0x73, 0x02, 0x50 }, 0xcf, 0xcf, ALPS_FW_BK_1 },		  /* Dell Vostro 1400 */
+-	{ { 0x52, 0x01, 0x14 }, 0xff, 0xff,
+-		ALPS_PASS | ALPS_DUALPOINT | ALPS_PS2_INTERLEAVED },	  /* Toshiba Tecra A11-11L */
+ };
+ 
+ /*

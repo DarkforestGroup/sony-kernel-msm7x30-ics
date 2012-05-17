@@ -1,0 +1,10 @@
+--- drivers/md/md.h
++++ drivers/md/md.h
+@@ -289,6 +289,7 @@
+ 								* hot-adding a bitmap.  It should
+ 								* eventually be settable by sysfs.
+ 								*/
++	struct mutex			bitmap_mutex;
+ 
+ 	struct list_head		all_mddevs;
+ };

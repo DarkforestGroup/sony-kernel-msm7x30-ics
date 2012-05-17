@@ -1,0 +1,12 @@
+--- fs/9p/vfs_super.c
++++ fs/9p/vfs_super.c
+@@ -188,7 +188,8 @@
+ 
+ 	P9_DPRINTK(P9_DEBUG_VFS, " %p\n", s);
+ 
+-	v9fs_dentry_release(s->s_root);	/* clunk root */
++	if (s->s_root)
++		v9fs_dentry_release(s->s_root);	/* clunk root */
+ 
+ 	kill_anon_super(s);
+ 

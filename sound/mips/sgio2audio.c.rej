@@ -1,0 +1,11 @@
+--- sound/mips/sgio2audio.c
++++ sound/mips/sgio2audio.c
+@@ -609,7 +609,7 @@
+ 	/* alloc virtual 'dma' area */
+ 	if (runtime->dma_area)
+ 		vfree(runtime->dma_area);
+-	runtime->dma_area = vmalloc(size);
++	runtime->dma_area = vmalloc_user(size);
+ 	if (runtime->dma_area == NULL)
+ 		return -ENOMEM;
+ 	runtime->dma_bytes = size;
