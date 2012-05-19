@@ -1,0 +1,94 @@
+--- drivers/misc/pmem.c
++++ drivers/misc/pmem.c
+@@ -32,8 +28,7 @@
+ #include <asm/uaccess.h>
+ #include <asm/cacheflush.h>
+ #include <asm/sizes.h>
+-#include <asm/mach/map.h>
+-#include <asm/page.h>
++#include <linux/pm_runtime.h>
+ 
+ #define PMEM_MAX_USER_SPACE_DEVICES (10)
+ #define PMEM_MAX_KERNEL_SPACE_DEVICES (2)
+@@ -1020,17 +868,17 @@
+ 
+ static int
+ bitmap_allocate_contiguous(uint32_t *bitp, int num_bits_to_alloc,
+-		int total_bits, int spacing)
++		int total_bits, int spacing, int start_bit)
+ {
+ 	int bit_start, last_bit, word_index;
+ 
+ 	if (num_bits_to_alloc <= 0)
+ 		return -1;
+ 
+-	for (bit_start = 0; ;
+-		bit_start = (last_bit +
++	for (bit_start = start_bit; ;
++		bit_start = ((last_bit +
+ 			(word_index << PMEM_32BIT_WORD_ORDER) + spacing - 1)
+-			& ~(spacing - 1)) {
++			& ~(spacing - 1)) + start_bit) {
+ 		int bit_end = bit_start + num_bits_to_alloc, total_words;
+ 
+ 		if (bit_end > total_bits)
+@@ -1108,7 +956,8 @@
+ 	ret = bitmap_allocate_contiguous(pmem[id].allocator.bitmap.bitmap,
+ 		quanta_needed,
+ 		(pmem[id].size + pmem[id].quantum - 1) / pmem[id].quantum,
+-		spacing);
++		spacing,
++		start_bit);
+ 
+ #if PMEM_DEBUG
+ 	if (ret < 0)
+@@ -2462,40 +2213,15 @@
+ 
+ static void ioremap_pmem(int id)
+ {
+-	unsigned long addr;
+-	const struct mem_type *type;
+-
+-	DLOG("PMEMDEBUG: ioremaping for %s\n", pmem[id].name);
+-	if (pmem[id].map_on_demand) {
+-		addr = (unsigned long)pmem[id].area->addr;
+-		if (pmem[id].cached)
+-			type = get_mem_type(MT_DEVICE_CACHED);
+-		else
+-			type = get_mem_type(MT_DEVICE);
+-		DLOG("PMEMDEBUG: Remap phys %lx to virt %lx on %s\n",
+-			pmem[id].base, addr, pmem[id].name);
+-		if (ioremap_page_range(addr, addr + pmem[id].size,
+-			pmem[id].base, __pgprot(type->prot_pte))) {
+-				pr_err("pmem: Failed to map pages\n");
+-				BUG();
+-		}
+-		pmem[id].vbase = pmem[id].area->addr;
+-		/* Flush the cache after installing page table entries to avoid
+-		 * aliasing when these pages are remapped to user space.
+-		 */
+-		flush_cache_vmap(addr, addr + pmem[id].size);
+-	} else {
+-		if (pmem[id].cached)
+-			pmem[id].vbase = ioremap_cached(pmem[id].base,
+-						pmem[id].size);
+-	#ifdef ioremap_ext_buffered
+-		else if (pmem[id].buffered)
+-			pmem[id].vbase = ioremap_ext_buffered(pmem[id].base,
+-						pmem[id].size);
+-	#endif
+-		else
+-			pmem[id].vbase = ioremap(pmem[id].base, pmem[id].size);
+-	}
++	if (pmem[id].cached)
++		pmem[id].vbase = ioremap_cached(pmem[id].base, pmem[id].size);
++#ifdef ioremap_ext_buffered
++	else if (pmem[id].buffered)
++		pmem[id].vbase = ioremap_ext_buffered(pmem[id].base,
++					pmem[id].size);
++#endif
++	else
++		pmem[id].vbase = ioremap(pmem[id].base, pmem[id].size);
+ }
+ 
+ #ifdef CONFIG_MEMORY_HOTPLUG
