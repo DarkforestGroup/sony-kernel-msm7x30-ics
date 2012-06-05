@@ -102,7 +102,7 @@ void blk_set_default_limits(struct queue_limits *lim)
 	lim->alignment_offset = 0;
 	lim->io_opt = 0;
 	lim->misaligned = 0;
-	lim->cluster = 1;
+	lim->no_cluster = 0;
 }
 EXPORT_SYMBOL(blk_set_default_limits);
 
